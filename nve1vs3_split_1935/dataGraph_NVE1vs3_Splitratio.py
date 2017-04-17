@@ -160,7 +160,7 @@ def showAllAcceptionRatioImage( key_1, key_2, limits, record_1, record_2, record
 	sum_1 = 0
 	sum_2 = 0
 	index = 0
-	for item_1, item_2 in zip(record_1[key_1], record_1[key_2]):
+	for item_1, item_2 in zip(rerecord_1cord_1[key_1], record_1[key_2]):
 		index = index + 1
 		sum_1 = sum_1 + item_1['Total']
 		sum_2 = sum_2 + item_2['Total']
@@ -562,6 +562,133 @@ def showTwoVirNwsSubCostImage( key_1, key_2, limits, record_1, record_2, ytxt, x
 	del values_1[:]
 	del values_2[:]
 
+
+#key_1 = 'EmbeddedBandwidth', 
+#key_2 = 'EmbeddedNodes'
+#key_11 = 'SublinkCost'
+#key_22 = 'EmbeddedNodes'
+#Revenue to subcost = Revenue / SubCost
+## key_1 and key_2 to calculate revenue
+## key_11 and key_22 to calcuate subcost
+
+def showTowVirNwsRevenueToSubCostImage( key_1, key_2, key_11, key_22, limits, record_1, record_2, ytxt, xtxt, title, ratio):
+	timing_1 = []
+	timing_2 = []
+
+	values_1 = []
+	values_2 = []
+
+	timing_1.append(0)
+	timing_2.append(0)
+
+	values_1.append(0)
+	values_2.append(0)
+
+	sum_1 = 0
+	sum_2 = 0
+	sum_3 = 0
+	sum_4 = 0
+
+	index = 0
+	for item_1, item_2, item_11, item_22 in zip(record_1[key_1], record_1[key_2],record_1[key_11], record_1[key_22]):
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+		sum_2 = sum_2 + item_2['Total']
+
+		sum_3 = sum_3 + item_11['Total']
+		sum_4 = sum_4 + item_22['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_1.append(index)
+			if float(sum_1 + sum_2) == 0.0 or float(sum_3 + sum_4) == 0.0:
+				values_1.append( 0.0 )
+			else:
+				
+				values_1.append(  float(sum_1 + sum_2) / float(sum_3 + sum_4) )
+			sum_1 = 0
+			sum_2 = 0
+			sum_3 = 0
+			sum_4 = 0
+
+	sum_1 = 0
+	sum_2 = 0
+	sum_3 = 0
+	sum_4 = 0
+
+	index = 0
+	for item_1, item_2, item_11, item_22 in zip(record_2[key_1], record_2[key_2],record_2[key_11], record_2[key_22]):
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+		sum_2 = sum_2 + item_2['Total']
+
+		sum_3 = sum_3 + item_11['Total']
+		sum_4 = sum_4 + item_22['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_2.append(index)
+			if float(sum_1 + sum_2) == 0.0 or float(sum_3 + sum_4) == 0.0:
+				values_2.append( 0.0 )
+			else:
+				
+				values_2.append(  float(sum_1 + sum_2) / float(sum_3 + sum_4) )
+			sum_1 = 0
+			sum_2 = 0
+			sum_3 = 0
+			sum_4 = 0
+
+
+	print len(timing_1)
+	print timing_1
+	print len(values_1)
+	print values_1
+	print len(timing_2)
+	print timing_2
+	print len(values_2)
+	print values_2
+
+
+	col = 'y'
+	if ratio == '20':
+		col = 'g'
+
+	if ratio == '30':
+		col = 'r'
+
+	if ratio == '40':
+		col = 'c'
+
+	if ratio == '50':
+		col = 'm'
+
+	plt.plot(timing_1, values_1,label='NVE#1-No-Split',marker='o', markersize=5, color='b' )
+	plt.plot(timing_2, values_2,label='NVE#3-SplitRatio:' + ratio + '%',marker='o', markersize=5, color=col )
+
+	pylab.legend(loc='best', ncol=3, mode="expand", borderaxespad=0.,fontsize='small')
+
+	plt.ylabel(ytxt)
+	plt.xlabel(xtxt)
+	plt.title(title)
+
+	plt.grid(True)
+	
+	print plt.gca().get_ylim()
+	x_limits, y_limits = plt.gca().get_ylim()
+	plt.ylim(0, y_limits * 1.15 )
+
+
+	formatter = FuncFormatter(to_percent)
+	plt.gca().yaxis.set_major_formatter(formatter)
+
+	plt.savefig('./'+ title + '_' + ratio + '.png')
+	plt.show()
+
+	del timing_1[:]
+	del timing_2[:]
+
+	del values_1[:]
+	del values_2[:]
+
+
 # key_1 : EmbeddedBandwidth
 # key_2 : EmbeddedNodes (1 vnode : 1 cpu)
 # VirNwsRevenue = EmbeddedBandwidth + sum(embeddedNodes'cpu)
@@ -873,6 +1000,370 @@ def showAllVirNwsSubCostImage( key_1, key_2, limits, record_1, record_2, record_
 	del values_4[:]
 	del values_5[:]
 
+#key_1 = 'EmbeddedBandwidth', 
+#key_2 = 'EmbeddedNodes'
+#key_11 = 'SublinkCost'
+#key_22 = 'EmbeddedNodes'
+#Revenue to subcost = Revenue / SubCost
+## key_1 and key_2 to calculate revenue
+## key_11 and key_22 to calcuate subcost
+
+def showAllVirNwsRevenueToSubCostImage( key_1, key_2, key_11, key_22, limits, record_1, record_2, record_3, record_4, record_5, ytxt, xtxt, title):
+	timing_1 = []
+	timing_2 = []
+	timing_3 = []
+	timing_4 = []
+	timing_5 = []
+
+	values_1 = []
+	values_2 = []
+	values_3 = []
+	values_4 = []
+	values_5 = []
+
+
+	
+	timing_1.append(0)
+	timing_2.append(0)
+	timing_3.append(0)
+	timing_4.append(0)
+	timing_5.append(0)
+
+	values_1.append(0)
+	values_2.append(0)
+	values_3.append(0)
+	values_4.append(0)
+	values_5.append(0)
+
+	sum_1 = 0
+	sum_2 = 0
+	sum_3 = 0
+	sum_4 = 0
+
+	index = 0
+	for item_1, item_2, item_11, item_22 in zip(record_1[key_1], record_1[key_2],record_1[key_11], record_1[key_22]):
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+		sum_2 = sum_2 + item_2['Total']
+
+		sum_3 = sum_3 + item_11['Total']
+		sum_4 = sum_4 + item_22['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_1.append(index)
+			if float(sum_1 + sum_2) == 0.0 or float(sum_3 + sum_4) == 0.0:
+				values_1.append( 0.0 )
+			else:
+				
+				values_1.append(  float(sum_1 + sum_2) / float(sum_3 + sum_4) )
+			sum_1 = 0
+			sum_2 = 0
+			sum_3 = 0
+			sum_4 = 0
+
+	sum_1 = 0
+	sum_2 = 0
+	sum_3 = 0
+	sum_4 = 0
+
+	index = 0
+	for item_1, item_2, item_11, item_22 in zip(record_2[key_1], record_2[key_2],record_2[key_11], record_2[key_22]):
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+		sum_2 = sum_2 + item_2['Total']
+
+		sum_3 = sum_3 + item_11['Total']
+		sum_4 = sum_4 + item_22['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_2.append(index)
+			if float(sum_1 + sum_2) == 0.0 or float(sum_3 + sum_4) == 0.0:
+				values_2.append( 0.0 )
+			else:
+				
+				values_2.append(  float(sum_1 + sum_2) / float(sum_3 + sum_4) )
+			sum_1 = 0
+			sum_2 = 0
+			sum_3 = 0
+			sum_4 = 0
+
+	sum_1 = 0
+	sum_2 = 0
+	sum_3 = 0
+	sum_4 = 0
+
+	index = 0
+	for item_1, item_2, item_11, item_22 in zip(record_3[key_1], record_3[key_2],record_3[key_11], record_3[key_22]):
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+		sum_2 = sum_2 + item_2['Total']
+
+		sum_3 = sum_3 + item_11['Total']
+		sum_4 = sum_4 + item_22['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_3.append(index)
+			if float(sum_1 + sum_2) == 0.0 or float(sum_3 + sum_4) == 0.0:
+				values_3.append( 0.0 )
+			else:
+				
+				values_3.append(  float(sum_1 + sum_2) / float(sum_3 + sum_4) )
+			sum_1 = 0
+			sum_2 = 0
+			sum_3 = 0
+			sum_4 = 0
+
+	sum_1 = 0
+	sum_2 = 0
+	sum_3 = 0
+	sum_4 = 0
+
+	index = 0
+	for item_1, item_2, item_11, item_22 in zip(record_4[key_1], record_4[key_2],record_4[key_11], record_4[key_22]):
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+		sum_2 = sum_2 + item_2['Total']
+
+		sum_3 = sum_3 + item_11['Total']
+		sum_4 = sum_4 + item_22['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_4.append(index)
+			if float(sum_1 + sum_2) == 0.0 or float(sum_3 + sum_4) == 0.0:
+				values_4.append( 0.0 )
+			else:
+				
+				values_4.append(  float(sum_1 + sum_2) / float(sum_3 + sum_4) )
+			sum_1 = 0
+			sum_2 = 0
+			sum_3 = 0
+			sum_4 = 0
+
+	sum_1 = 0
+	sum_2 = 0
+	sum_3 = 0
+	sum_4 = 0
+
+	index = 0
+	for item_1, item_2, item_11, item_22 in zip(record_5[key_1], record_5[key_2],record_5[key_11], record_5[key_22]):
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+		sum_2 = sum_2 + item_2['Total']
+
+		sum_3 = sum_3 + item_11['Total']
+		sum_4 = sum_4 + item_22['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_5.append(index)
+			if float(sum_1 + sum_2) == 0.0 or float(sum_3 + sum_4) == 0.0:
+				values_5.append( 0.0 )
+			else:
+				
+				values_5.append(  float(sum_1 + sum_2) / float(sum_3 + sum_4) )
+			sum_1 = 0
+			sum_2 = 0
+			sum_3 = 0
+			sum_4 = 0
+
+
+	print len(timing_1)
+	print timing_1
+	print len(values_1)
+	print values_1
+	print len(timing_2)
+	print timing_2
+	print len(values_2)
+	print values_2
+	print len(timing_3)
+	print timing_3
+	print len(values_3)
+	print values_3
+	print len(timing_4)
+	print timing_4
+	print len(values_4)
+	print values_4
+	print len(timing_5)
+	print timing_5
+	print len(values_5)
+	print values_5
+
+	plt.plot(timing_1, values_1,label='NVE#1-No-Split',marker='o', markersize=5, color='b' )
+	plt.plot(timing_2, values_2,label='NVE#3-SplitRatio:20%',marker='o', markersize=5, color='g' )
+	plt.plot(timing_3, values_3,label='NVE#3-SplitRatio:30%',marker='o', markersize=5, color='r' )
+	plt.plot(timing_4, values_4,label='NVE#3-SplitRatio:40%',marker='o', markersize=5, color='c' )
+	plt.plot(timing_5, values_5,label='NVE#3-SplitRatio:50%',marker='o', markersize=5, color='m')
+
+	pylab.legend(loc='best', ncol=3, mode="expand", borderaxespad=0.,fontsize='small')
+
+	plt.ylabel(ytxt)
+	plt.xlabel(xtxt)
+	plt.title(title)
+
+	plt.grid(True)
+	
+	print plt.gca().get_ylim()
+	x_limits, y_limits = plt.gca().get_ylim()
+	plt.ylim(0, y_limits * 1.15 )
+
+	formatter = FuncFormatter(to_percent)
+	plt.gca().yaxis.set_major_formatter(formatter)
+
+	plt.savefig('./'+ title + '.png')
+	plt.show()
+
+	del timing_1[:]
+	del timing_2[:]
+	del timing_3[:]
+	del timing_4[:]
+	del timing_5[:]
+
+	del values_1[:]
+	del values_2[:]
+	del values_3[:]
+	del values_4[:]
+	del values_5[:]
+
+
+
+# key_1 : DataSwichingEnergy
+def showAllVirNwsSwitchingEnergyImage( key_1, limits, record_1, record_2, record_3, record_4, record_5, ytxt, xtxt, title):
+	timing_1 = []
+	timing_2 = []
+	timing_3 = []
+	timing_4 = []
+	timing_5 = []
+
+	values_1 = []
+	values_2 = []
+	values_3 = []
+	values_4 = []
+	values_5 = []
+
+
+	
+	timing_1.append(0)
+	timing_2.append(0)
+	timing_3.append(0)
+	timing_4.append(0)
+	timing_5.append(0)
+
+	values_1.append(0)
+	values_2.append(0)
+	values_3.append(0)
+	values_4.append(0)
+	values_5.append(0)
+
+	sum_1 = 0
+	index = 0
+	for item_1 in record_1[key_1]:
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_1.append(index)
+			values_1.append(float(sum_1) / float(limits))
+			sum_1 = 0
+
+	sum_1 = 0
+	index = 0
+	for item_1 in record_2[key_1]:
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_2.append(index)
+			values_2.append(float(sum_1) / float(limits))
+			sum_1 = 0
+
+	sum_1 = 0
+	index = 0
+	for item_1 in record_3[key_1]:
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_3.append(index)
+			values_3.append(float(sum_1) / float(limits))
+			sum_1 = 0
+
+
+	sum_1 = 0
+	index = 0
+	for item_1 in record_4[key_1]:
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_4.append(index)
+			values_4.append(float(sum_1) / float(limits))
+			sum_1 = 0
+
+	sum_1 = 0
+	index = 0
+	for item_1 in record_5[key_1]:
+		index = index + 1
+		sum_1 = sum_1 + item_1['Total']
+
+		if (index > 1 ) and ((index % limits) == 0):
+			timing_5.append(index)
+			values_5.append(float(sum_1) / float(limits))
+			sum_1 = 0
+
+
+	print len(timing_1)
+	print timing_1
+	print len(values_1)
+	print values_1
+	print len(timing_2)
+	print timing_2
+	print len(values_2)
+	print values_2
+	print len(timing_3)
+	print timing_3
+	print len(values_3)
+	print values_3
+	print len(timing_4)
+	print timing_4
+	print len(values_4)
+	print values_4
+	print len(timing_5)
+	print timing_5
+	print len(values_5)
+	print values_5
+
+	plt.plot(timing_1, values_1,label='NVE#1-No-Split',marker='o', markersize=5, color='b' )
+	plt.plot(timing_2, values_2,label='NVE#3-SplitRatio:20%',marker='o', markersize=5, color='g' )
+	plt.plot(timing_3, values_3,label='NVE#3-SplitRatio:30%',marker='o', markersize=5, color='r' )
+	plt.plot(timing_4, values_4,label='NVE#3-SplitRatio:40%',marker='o', markersize=5, color='c' )
+	plt.plot(timing_5, values_5,label='NVE#3-SplitRatio:50%',marker='o', markersize=5, color='m')
+
+	pylab.legend(loc='best', ncol=3, mode="expand", borderaxespad=0.,fontsize='small')
+
+	plt.ylabel(ytxt)
+	plt.xlabel(xtxt)
+	plt.title(title)
+
+	plt.grid(True)
+	
+	print plt.gca().get_ylim()
+	x_limits, y_limits = plt.gca().get_ylim()
+	plt.ylim(0, y_limits * 1.15 )
+
+	plt.savefig('./'+ title + '.png')
+	plt.show()
+
+	del timing_1[:]
+	del timing_2[:]
+	del timing_3[:]
+	del timing_4[:]
+	del timing_5[:]
+
+	del values_1[:]
+	del values_2[:]
+	del values_3[:]
+	del values_4[:]
+	del values_5[:]
+
 
 recordJson_1 = json.loads(open(nve_1_file).read())
 recordJson_2 = json.loads(open(nve_2_file).read())
@@ -884,66 +1375,95 @@ recordJson_5 = json.loads(open(nve_5_file).read())
 # key_1 : FailureEmbedding
 # key_1 : RequestEmbedding
 # AccetpionRatio = 1 - FailureEmbedding / RequestEmbedding
-showTwoAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_2, 'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio', '20')
+#showTwoAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_2, 'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio', '20')
 
-showTwoAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_3, 'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio', '30')
+#showTwoAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_3, 'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio', '30')
 
-showTwoAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_4, 'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio', '40')
+#showTwoAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_4, 'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio', '40')
 
-showTwoAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_5, 'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio', '50')
-
-
-showAllAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio')
+#showTwoAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_5, 'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio', '50')
 
 
-# total virtual neworks
-showTwoVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, 'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue', '20')
+#showAllAcceptionRatioImage( 'FailureEmbedding', 'RequestEmbedding', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Accetpion Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Request Accetpion Ratio')
 
-showTwoVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_3, 'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue', '30')
 
-showTwoVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_4, 'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue', '40')
+# total virtual neworks Revenue
+#showTwoVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, 'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue', '20')
 
-showTwoVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_5, 'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue', '50')
+#showTwoVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_3, 'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue', '30')
 
-showAllVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue')
-# total virtual neworks
+#showTwoVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_4, 'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue', '40')
 
-# same virtual networks
-showTwoVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, 'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue', '20')
+#showTwoVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_5, 'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue', '50')
 
-showTwoVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_3, 'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue', '30')
+#showAllVirNwsRevenueImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Revenue', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue')
+# total virtual neworks Revenue
 
-showTwoVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_4, 'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue', '40')
+## same virtual networks Revenue
+#showTwoVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, 'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue', '20')
 
-showTwoVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_5, 'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue', '50')
+#showTwoVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_3, 'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue', '30')
 
-showAllVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue')
-# same virtual networks
+#showTwoVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_4, 'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue', '40')
 
-# total virtual neworks substrate cost
-showTwoVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, 'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost', '20')
+#showTwoVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_5, 'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue', '50')
 
-showTwoVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_3, 'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost', '30')
+#showAllVirNwsRevenueImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Revenue', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue')
+## same virtual networks Revenue
 
-showTwoVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_4, 'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost', '40')
+## total virtual neworks substrate cost
+#showTwoVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, 'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost', '20')
 
-showTwoVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_5, 'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost', '50')
+#showTwoVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_3, 'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost', '30')
 
-showAllVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost')
-# total virtual neworks substrate cost
+#showTwoVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_4, 'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost', '40')
 
-# same virtual networks substrate cost
-showTwoVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, 'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost', '20')
+#showTwoVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_5, 'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost', '50')
 
-showTwoVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_3, 'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost', '30')
+#showAllVirNwsSubCostImage( 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Cost', 'Time Unit(s)', 'Evaluation of Virtual Network Cost')
+## total virtual neworks substrate cost
 
-showTwoVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_4, 'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost', '40')
+## same virtual networks substrate cost
+#showTwoVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, 'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost', '20')
 
-showTwoVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_5, 'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost', '50')
+#showTwoVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_3, 'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost', '30')
 
-showAllVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost')
-# same virtual networks substrate cost
+#showTwoVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_4, 'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost', '40')
 
+#showTwoVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_5, 'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost', '50')
+
+#showAllVirNwsSubCostImage( 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Cost', 'Time Unit(s)', 'Evaluation of Same Virtual Network Cost')
+## same virtual networks substrate cost
+
+
+## total virtual network revenue to cost ratio
+#showTowVirNwsRevenueToSubCostImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, 'Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue to Cost Ratio', '20')
+
+#showTowVirNwsRevenueToSubCostImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_3, 'Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue to Cost Ratio', '30')
+
+#showTowVirNwsRevenueToSubCostImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_4, 'Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue to Cost Ratio', '40')
+
+#showTowVirNwsRevenueToSubCostImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_5, 'Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue to Cost Ratio', '50')
+
+#showAllVirNwsRevenueToSubCostImage( 'EmbeddedBandwidth', 'EmbeddedNodes', 'SublinkCost', 'EmbeddedNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Ratio', 'Time Unit(s)', 'Evaluation of Virtual Network Revenue to Cost Ratio')
+## total virtual network revenue to cost ratio
+
+## Same virtual networks revenue to cost ratio
+
+#showTowVirNwsRevenueToSubCostImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, 'Ratio', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue to Cost Ratio', '20')
+
+#showTowVirNwsRevenueToSubCostImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_3, 'Ratio', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue to Cost Ratio', '30')
+
+#showTowVirNwsRevenueToSubCostImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_4, 'Ratio', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue to Cost Ratio', '40')
+
+#showTowVirNwsRevenueToSubCostImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_5, 'Ratio', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue to Cost Ratio', '50')
+
+#showAllVirNwsRevenueToSubCostImage( 'SameVirNwEmbeddedBandwidth', 'SameVirNwVNodes', 'SameVirNwSubCost', 'SameVirNwVNodes', 200, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Ratio', 'Time Unit(s)', 'Evaluation of Same Virtual Network Revenue to Cost Ratio')
+## Same virtual networks revenue to cost ratio
+
+## total data swiching energy
+showAllVirNwsSwitchingEnergyImage('DataSwichingEnergy', 100, recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5,'Switching Energy(Joule)','Time Unit(s)','Evaluation of Virtual Network Data Switching Energy')
+## total data swiching energy
 
 showImage( 'AmountVirNws', recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5, 'Virtual Network(s)','Time Unit(s)','Evaluation of Embedded Virtual Network(s)')
 
@@ -1001,5 +1521,5 @@ showImage('SameVirNwEmbeddedLinks', recordJson_1, recordJson_2, recordJson_3, re
 
 showImage('SameVirNwVNodes', recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5, 'Virtual Node(s)','Time Unit(s)','Evaluation of Same Virtual Network Nodes')
 
-showImage('RequestEmbedding', recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5, 'Cost(s)','Time Unit(s)','Evaluation of Virtual Network Requests')
+showImage('RequestEmbedding', recordJson_1, recordJson_2, recordJson_3, recordJson_4, recordJson_5, 'Request(s)','Time Unit(s)','Evaluation of Virtual Network Requests')
 
